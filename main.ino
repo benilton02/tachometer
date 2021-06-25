@@ -54,6 +54,14 @@ void loop() {
 
 
 void leftRotation(){
+  if(millis() - timeToShow > 500){
+    lcd.print("                ");
+    lcd.setCursor(0, 0);
+    lcd.print("RPM: ");
+    lcd.print(rpm);
+    lcd.setCursor(0, 1);
+    lcd.print("Rotation: LEFT");
+  }
   digitalWrite(mla, LOW);
   digitalWrite(mlb, HIGH);
   analogWrite(velocity, intensity);
@@ -61,6 +69,16 @@ void leftRotation(){
 
 
 void rightRotation(){
+  if(millis() - timeToShow > 500){
+    lcd.print("                ");
+    lcd.setCursor(0, 0);
+    lcd.print("RPM: ");
+    lcd.print(rpm);
+    lcd.setCursor(0, 1);
+    lcd.print("Rotation: RIGHT");
+    timeToShow = millis();
+  }
+
   digitalWrite(mla, HIGH);
   digitalWrite(mlb, LOW);
   analogWrite(velocity, intensity);
@@ -68,6 +86,13 @@ void rightRotation(){
 
 
 void stopMotor(){
+  if(millis() - timeToShow > 500){
+    lcd.print("                ");
+    lcd.setCursor(0, 0);
+    lcd.print("RPM: ---");
+    lcd.setCursor(0, 1);
+    lcd.print("Motor: STOP!");
+  }
   digitalWrite(mla, LOW);
   digitalWrite(mlb, LOW);
   analogWrite(velocity, intensity);
@@ -102,38 +127,14 @@ void motorStatus(){
   
   case 0:
     stopMotor(); 
-    if(millis() - timeToShow > 500){
-      lcd.print("                ");
-      lcd.setCursor(0, 0);
-      lcd.print("RPM: ---");
-      lcd.setCursor(0, 1);
-      lcd.print("Motor: STOP!");
-    }
     break;
 
   case 1:
     rightRotation();
-    if(millis() - timeToShow > 500){
-      lcd.print("                ");
-      lcd.setCursor(0, 0);
-      lcd.print("RPM: ");
-      lcd.print(rpm);
-      lcd.setCursor(0, 1);
-      lcd.print("Rotation: RIGHT");
-      timeToShow = millis();
-    }
     break;
 
   case 2:
     leftRotation();
-    if(millis() - timeToShow > 500){
-      lcd.print("                ");
-      lcd.setCursor(0, 0);
-      lcd.print("RPM: ");
-      lcd.print(rpm);
-      lcd.setCursor(0, 1);
-      lcd.print("Rotation: LEFT");
-    }
     break;
     
   case 3:
