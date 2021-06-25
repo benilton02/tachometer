@@ -2,6 +2,7 @@
 #include <NewPing.h>
 
 #define pushButton 11
+#define opticalPin 2
 
 #define velocity 6 
 #define mla 3
@@ -19,10 +20,14 @@
 LiquidCrystal_I2C lcd(address, column, row);
 NewPing sonar(triggerPin, echoPin, safetyDistance);
 
-volatile unsigned int currentDistance;
-volatile unsigned long int buttonTime = 0;
-volatile unsigned int statusPushButton = 0;
-volatile unsigned int option = 0;
+volatile unsigned int statusPushButton = 0,
+                      currentDistance,
+                      buttonTime = 0,
+                      rpmTime = 0,
+                      option = 0,
+                      rpm = 0,
+                      timeToShow = millis(),
+                      rev = 0;
 
 
 void setup() {
@@ -34,9 +39,11 @@ void setup() {
 
 
 void loop() {
-  if(checkSafetyDistance()){
+  //if(checkSafetyDistance()){
+   if(true){
     checkButton();
     motorStatus();
+    calculateRpm();
   }
   else
     stopMotor();
@@ -53,24 +60,42 @@ void leftRotation(){
 void rightRotation(){
   digitalWrite(mla, HIGH);
   digitalWrite(mlb, LOW);
-  analogWrite(velocity, 255);
+  analogWrite(velocity, 180);
 }
 
 
 void stopMotor(){
   digitalWrite(mla, LOW);
   digitalWrite(mlb, LOW);
-  analogWrite(velocity, 255);
+  analogWrite(velocity, 0);
 }
 
 
 void setPin(){
   pinMode(pushButton, INPUT_PULLUP);
-  pinMode(velocity, OUTPUT);
   pinMode(mla, OUTPUT);
   pinMode(mlb, OUTPUT);
+  pinMode(opticalPin, opticalPin);
+  pinMode(velocity, OUTPUT);
+  rpmTime = millis();
 }
 
+void calculateRpm(){
+  attachInterrupt(digitalPinToInterrupt(opticalPin), revolution, RISING);
+  if(millis() - rpmTime > 1000 ){
+    detachInterrupt(digitalPinToInterrupt(opticalPin));
+    rpm =rev*3;
+    //Serial.print("RPM ---> ");
+    //Serial.println(rpm);
+    rev = 0;
+    rpmTime = millis();
+    attachInterrupt(digitalPinToInterrupt(opticalPin), revolution, RISING);
+  }
+}
+
+void revolution(){
+  rev++;  
+}
 
 void motorStatus(){
   switch(option){
@@ -78,20 +103,34 @@ void motorStatus(){
   case 0:
     stopMotor(); 
     lcd.print("                ");
+    delay(100);
+    lcd.setCursor(0, 0);
+    lcd.print("RPM: 0");
     lcd.setCursor(0, 1);
     lcd.print("Motor: STOP!");
     break;
 
   case 1:
     rightRotation();
-    lcd.print("                ");
-    lcd.setCursor(0, 1);
-    lcd.print("Rotation: RIGHT");
+    
+    if(millis() - timeToShow > 100){
+      lcd.print("                ");
+      lcd.setCursor(0, 0);
+      lcd.print("RPM: ");
+      lcd.print(rpm);
+      lcd.setCursor(0, 1);
+      lcd.print("Rotation: RIGHT");
+      timeToShow = millis();
+    }
     break;
 
   case 2:
     leftRotation();
     lcd.print("                ");
+    delay(50);
+    lcd.setCursor(0, 0);
+    lcd.print("RPM: ");
+    lcd.print(rpm);
     lcd.setCursor(0, 1);
     lcd.print("Rotation: LEFT");
     break;
