@@ -3,6 +3,7 @@
 
 #define pushButton 11
 #define opticalPin 2
+#define buzzerPin 8
 
 #define velocity 6 
 #define mla 3
@@ -29,6 +30,7 @@ volatile unsigned int statusPushButton = 0,
 
 volatile unsigned long int timeToShow = millis(),
                            buttonTime = millis(),
+                           timeBuzzer = millis(),
                            rpmTime = millis();
 
 
@@ -52,7 +54,6 @@ void loop() {
 }
 
 
-
 void leftRotation(){
   if(millis() - timeToShow > 500){
     lcd.print("                ");
@@ -65,10 +66,17 @@ void leftRotation(){
   digitalWrite(mla, LOW);
   digitalWrite(mlb, HIGH);
   analogWrite(velocity, intensity);
+
+  if(millis() - timeBuzzer > 100){
+    digitalWrite(buzzerPin, rev%2);
+    timeBuzzer = millis();
+  }
+  
 }
 
 
 void rightRotation(){
+  digitalWrite(buzzerPin, LOW);
   if(millis() - timeToShow > 500){
     lcd.print("                ");
     lcd.setCursor(0, 0);
@@ -86,6 +94,7 @@ void rightRotation(){
 
 
 void stopMotor(){
+  digitalWrite(buzzerPin, LOW);
   if(millis() - timeToShow > 500){
     lcd.print("                ");
     lcd.setCursor(0, 0);
@@ -100,12 +109,14 @@ void stopMotor(){
 
 
 void setPin(){
+  pinMode(buzzerPin, OUTPUT);
   pinMode(pushButton, INPUT_PULLUP);
   pinMode(mla, OUTPUT);
   pinMode(mlb, OUTPUT);
   pinMode(opticalPin, opticalPin);
   pinMode(velocity, OUTPUT);
 }
+
 
 void calculateRpm(){
   attachInterrupt(digitalPinToInterrupt(opticalPin), revolution, RISING);
@@ -118,9 +129,11 @@ void calculateRpm(){
   }
 }
 
+
 void revolution(){
   rev++;  
 }
+
 
 void motorStatus(){
   switch(option){
@@ -143,9 +156,11 @@ void motorStatus(){
   }
 }
 
+
 void resetOption(){
   option = 0;  
 }
+
 
 void setLcd(){
   lcd.init();
@@ -168,6 +183,6 @@ void checkButton(){
 bool checkSafetyDistance(){
   delay(50);                     
   currentDistance = sonar.ping_cm();
-  Serial.println(currentDistance);
+  //Serial.println(currentDistance);
   return currentDistance != 0 ? false : true;
 }
