@@ -23,7 +23,7 @@ NewPing sonar(triggerPin, echoPin, safetyDistance);
 
 volatile unsigned int statusPushButton = 0,
                       currentDistance = 0,
-                      intensity = 150,
+                      intensity = 210,
                       option = 0,
                       rpm = 0,
                       rev = 0;
@@ -68,7 +68,7 @@ void leftRotation(){
   analogWrite(velocity, intensity);
 
   if(millis() - timeBuzzer > 100){
-    digitalWrite(buzzerPin, rev%2);
+    digitalWrite(buzzerPin, (millis()/1000)%2);
     timeBuzzer = millis();
   }
   
@@ -183,6 +183,5 @@ void checkButton(){
 bool checkSafetyDistance(){
   delay(50);                     
   currentDistance = sonar.ping_cm();
-  //Serial.println(currentDistance);
   return currentDistance != 0 ? false : true;
 }
