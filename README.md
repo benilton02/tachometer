@@ -17,3 +17,17 @@
 > 6. It must be easy to move and install, that is, small, light, portable and DC powered without an AC outlet, except for the 12V DC motor power supply;
 >
 > 7. It must have a structure of plastic, wood or any other type of material.
+
+##  Schematic
+
+![electrical_schematic](https://github.com/benilton02/tachometer/blob/master/assets/schematic.png)
+
+## Team
+
+> Amanda da Silva Barbosa
+>
+> Benilton Seixas Andrade 
+>
+> Emerson da Silva Muniz
+>
+> Ingrid Mayumi Fonseca Ono
