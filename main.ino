@@ -23,7 +23,6 @@ NewPing sonar(triggerPin, echoPin, safetyDistance);
 
 volatile unsigned int statusPushButton = 0,
                       currentDistance = 0,
-                      intensity = 210,
                       option = 0,
                       rpm = 0,
                       rev = 0;
@@ -54,7 +53,7 @@ void loop() {
 }
 
 
-void leftRotation(){
+void leftRotation(int option){
   if(millis() - timeToShow > 500){
     lcd.print("                ");
     lcd.setCursor(0, 0);
@@ -65,7 +64,12 @@ void leftRotation(){
   }
   digitalWrite(mla, LOW);
   digitalWrite(mlb, HIGH);
-  analogWrite(velocity, intensity);
+
+  if(option == 4)
+    analogWrite(velocity, 150);
+ 
+  else
+    analogWrite(velocity, 255);
 
   if(millis() - timeBuzzer > 100){
     digitalWrite(buzzerPin, (millis()/1000)%2);
@@ -75,7 +79,7 @@ void leftRotation(){
 }
 
 
-void rightRotation(){
+void rightRotation(int option){
   digitalWrite(buzzerPin, LOW);
   if(millis() - timeToShow > 500){
     lcd.print("                ");
@@ -89,7 +93,12 @@ void rightRotation(){
 
   digitalWrite(mla, HIGH);
   digitalWrite(mlb, LOW);
-  analogWrite(velocity, intensity);
+
+  if(option == 2)
+    analogWrite(velocity, 150);
+
+  else
+      analogWrite(velocity, 255);
 }
 
 
@@ -104,7 +113,7 @@ void stopMotor(){
   }
   digitalWrite(mla, LOW);
   digitalWrite(mlb, LOW);
-  analogWrite(velocity, intensity);
+  analogWrite(velocity, 0);
 }
 
 
@@ -113,7 +122,7 @@ void setPin(){
   pinMode(pushButton, INPUT_PULLUP);
   pinMode(mla, OUTPUT);
   pinMode(mlb, OUTPUT);
-  pinMode(opticalPin, opticalPin);
+  pinMode(opticalPin, INPUT_PULLUP);
   pinMode(velocity, OUTPUT);
 }
 
@@ -143,14 +152,22 @@ void motorStatus(){
     break;
 
   case 1:
-    rightRotation();
+    rightRotation(option);
     break;
 
   case 2:
-    leftRotation();
+    rightRotation(option);
+    break;
+
+  case 3:
+    leftRotation(option);
     break;
     
-  case 3:
+  case 4:
+    leftRotation(option);
+    break;
+  
+  case 5:
     resetOption();
     break;
   }
